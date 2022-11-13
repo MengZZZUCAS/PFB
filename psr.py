@@ -61,4 +61,17 @@ def coherent_dedispersion(pol1,pol2,num):
     pol_out = np.sqrt(np.abs(pol1_t)**2 + np.abs(pol2_t)**2)
     
     return pol_out
+
+def coherent_dedispersion_pfb(pol1,pol2,num):
     
+    num = num // 2
+
+    apply_chirp(pol1,num)
+    apply_chirp(pol2,num)
+    
+    pol1_t = scipy.fft.ifft(pol1)
+    pol2_t = scipy.fft.ifft(pol2)
+    
+    pol_out = np.sqrt(np.abs(pol1_t)**2 + np.abs(pol2_t)**2)
+    
+    return pol_out

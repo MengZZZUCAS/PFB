@@ -29,3 +29,24 @@ def polyphase_filter(data,filter_coeffs,channel_num):
 
     dispatch_data = scipy.fft.ifft(filt_data, axis=0)
     return dispatch_data
+
+def kernel(data,coeffs,nchannels): 
+    freq = polyphase_filter(data,coeffs,nchannels)
+    freq_size = freq.shape[1]
+    N = int(freq_size * nchannels // 2)
+    myfreq = np.zeros((N), dtype=complex)
+    mystart = 0
+    myend = 0
+    bw_size = freq_size
+    for i in range(nchannels // 2):
+        mystart = i*bw_size
+        myend = mystart + bw_size
+        myfreq[mystart:myend] = scipy.fft.fftshift(scipy.fft.fft(freq[i]))
+        
+    return myfreq,freq
+
+def criticalsample_pfb(pol1,pol2,coeffs,nchannels):
+    opfb1_f,sunfreq1 = kernel(pol1,coeffs,nchannels)
+    opfb2_f,sunfreq2 = kernel(pol2,coeffs,nchannels)
+    
+    return opfb1_f,opfb2_f,sunfreq1,sunfreq2

@@ -2,9 +2,6 @@ import numpy as np
 import scipy
 
 def realignment_coeffs(data):
-    """
-    对系数进行隔列插零
-    """
     z = np.zeros(data.shape[0])
     for i in range(data.shape[1]-1,0,-1):
         data = np.insert(data,i,z,axis=1)
@@ -36,12 +33,50 @@ def polyphase_filter(data,filter_coeffs,channel_num):
     polyphase_data = realignment_data(data, channel_num)
     polyphase_data = polyphase_data.reshape( (channel_num, -1), order='F')
     
-    # print(polyphase_data)
-    
     filt_data = np.zeros(polyphase_data.shape)
     for k in range(channel_num):
         filt_data[k] = scipy.signal.lfilter(filter_coeffs[k], 1, polyphase_data[k])
-        # filt_data[k] = scipy.signal.rfilter(filter_coeffs[k], 1, filt_data[k])
 
     dispatch_data = scipy.fft.ifft(filt_data, axis=0)
     return dispatch_data
+
+def kernel(data,coeffs,nchannels):
+       # coeffs = gen_filter_coeffs(ntaps,channel_num)  
+    subfreq = polyphase_filter(data,coeffs,nchannels)
+    freq_size = subfreq.shape[1]
+    N = int(freq_size * nchannels // 4)
+    myfreq = np.zeros((N), dtype=complex)
+    start = 0
+    end = 0
+    mystart = 0
+    myend = 0
+    bw = 0
+    for i in range(nchannels // 2 + 1):
+        mystart += bw
+        if i == 0:
+            start = freq_size // 2
+            end = freq_size // 2 + freq_size // 4
+        elif i == 8:
+            start = freq_size // 2 - freq_size // 4
+            end = freq_size // 2 
+        else:
+            start = freq_size // 2 - freq_size // 4
+            end = freq_size // 2 + freq_size // 4
+        bw = end - start
+        myend = mystart + bw
+        if i % 2 == 0:
+            myfreq[mystart:myend] = scipy.fft.fftshift(scipy.fft.fft(subfreq[i]))[start:end]
+        else:
+            myfreq[mystart:myend] = scipy.fft.fft(subfreq[i])[start:end]
+        
+    # opfb_t = np.abs(scipy.fft.fft(myfreq))
+    
+    return myfreq,subfreq
+
+def oversample_pfb(pol1,pol2,coeffs,nchannels):
+    opfb1_f,sunfreq1 = kernel(pol1,coeffs,nchannels)
+    opfb2_f,sunfreq2 = kernel(pol2,coeffs,nchannels)
+    
+    return opfb1_f,opfb2_f,sunfreq1,sunfreq2
+ 
+
