@@ -19,7 +19,7 @@ ptr,file_size = data.load_data(filename)
 # the num of blocks
 nblock = (file_size - 4096) // (2 * blocks)
 
-nblock = 10
+# nblock = 10
 
 if flag:
     print("the nblock is %d\n" % nblock)
@@ -66,9 +66,9 @@ end = time.time()
 print('程序运行时间:%s秒' % ((end - start)))
 
 if pfb_type == "opfb":
-    np.savetxt("opfb.txt",idata)
+    np.savetxt("subopfb.txt",idata)
 else:
-    np.savetxt("cspfb.txt",idata)
+    np.savetxt("subcspfb.txt",idata)
 
 
 plt.figure(figsize=(10,5),dpi=100)

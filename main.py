@@ -38,6 +38,8 @@ idata = psr.integral_data(pdata,psize)
 end = time.time()
 print('程序运行时间:%s秒' % ((end - start)))
 
+np.savetxt("psr.txt",idata)
+
 plt.figure(figsize=(10,5),dpi=100)
 plt.ylabel("Magnitude(dB)")
 plt.xlabel("Phase")
