@@ -35,18 +35,30 @@ def kernel(data,coeffs,nchannels):
     freq_size = freq.shape[1]
     N = int(freq_size * nchannels // 2)
     myfreq = np.zeros((N), dtype=complex)
+    start = 0
+    end = 0
     mystart = 0
     myend = 0
-    bw_size = freq_size
-    for i in range(nchannels // 2):
-        mystart = i*bw_size
-        myend = mystart + bw_size
-        myfreq[mystart:myend] = scipy.fft.fftshift(scipy.fft.fft(freq[i]))
+    size = 0
+    for i in range(nchannels // 2 + 1):
+        mystart += size
+        if i == 0:
+            start = freq_size // 2
+            end = freq_size
+        elif i == nchannels // 2:
+            start = 0
+            end = freq_size // 2 
+        else:
+            start = 0
+            end = freq_size
+        size = end - start
+        myend = mystart + size
+        myfreq[mystart:myend] = scipy.fft.fftshift(scipy.fft.fft(freq[i]))[start:end]
         
     return myfreq,freq
 
 def criticalsample_pfb(pol1,pol2,coeffs,nchannels):
-    opfb1_f,sunfreq1 = kernel(pol1,coeffs,nchannels)
-    opfb2_f,sunfreq2 = kernel(pol2,coeffs,nchannels)
+    cspfb1_f,sunfreq1 = kernel(pol1,coeffs,nchannels)
+    cspfb2_f,sunfreq2 = kernel(pol2,coeffs,nchannels)
     
-    return opfb1_f,opfb2_f,sunfreq1,sunfreq2
+    return cspfb1_f,cspfb2_f,sunfreq1,sunfreq2

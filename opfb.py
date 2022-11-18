@@ -56,7 +56,7 @@ def kernel(data,coeffs,nchannels):
         if i == 0:
             start = freq_size // 2
             end = freq_size // 2 + freq_size // 4
-        elif i == 8:
+        elif i == nchannels // 2:
             start = freq_size // 2 - freq_size // 4
             end = freq_size // 2 
         else:

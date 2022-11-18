@@ -16,7 +16,7 @@ ptr,file_size = data.load_data(filename)
 # the num of blocks
 nblock = (file_size - 4096) // (2 * blocks)
 
-nblock = 10
+# nblock = 10
 
 if flag:
     print("the nblock is %d\n" % nblock)

@@ -7,7 +7,7 @@ import opfb
 import psr
 
 flag = True
-pfb_type = "opfb"
+pfb_type = "cspfb"
 
 blocks = pow(2,22)
 
@@ -18,6 +18,8 @@ ptr,file_size = data.load_data(filename)
 
 # the num of blocks
 nblock = (file_size - 4096) // (2 * blocks)
+
+# nblock = 10
 
 if flag:
     print("the nblock is %d\n" % nblock)
@@ -51,7 +53,10 @@ idata = psr.integral_data(pdata,psize)
 end = time.time()
 print('程序运行时间:%s秒' % ((end - start)))
 
-np.savetxt("opfb.txt",idata)
+if pfb_type == "opfb":
+    np.savetxt("opfb.txt",idata)
+else:
+    np.savetxt("cspfb.txt",idata)
 
 plt.figure(figsize=(10,5),dpi=100)
 plt.ylabel("Magnitude(dB)")
