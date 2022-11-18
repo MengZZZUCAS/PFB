@@ -1,6 +1,6 @@
 # polyphase filter
 
-* data format psrdaad
+* data format psrdada
 
 ## run
 
