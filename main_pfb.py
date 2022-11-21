@@ -7,11 +7,11 @@ import opfb
 import psr
 
 flag = True
-pfb_type = "cspfb"
+pfb_type = "opfb"
 
 blocks = pow(2,22)
 
-filename = "../data/J0437-4715.dada"
+filename = "../../data/J0437-4715.dada"
 
 # load data, and skip header(4096)
 ptr,file_size = data.load_data(filename)
@@ -19,7 +19,7 @@ ptr,file_size = data.load_data(filename)
 # the num of blocks
 nblock = (file_size - 4096) // (2 * blocks)
 
-# nblock = 10
+nblock = 10
 
 if flag:
     print("the nblock is %d\n" % nblock)
