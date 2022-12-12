@@ -55,6 +55,7 @@ for i in range(nblock):
     else:
         p1,p2,subfreq1,subfreq2 = cspfb.criticalsample_pfb(pol1,pol2,coeff,nchannels)
         psr.coherent_dedispersion_cspfb(subfreq1,subfreq2,nchannels,pdata,pnum,location)
+        
 if pfb_type == "opfb":      
     idata = psr.integral_data_opfb(pdata,psize,nchannels)  
 else:

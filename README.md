@@ -2,7 +2,7 @@
 
 ## data format
 
-pulsar baseband data for psrdada (CASPSR backend)
+pulsar baseband data (CASPSR backend)
 
 ## run
 

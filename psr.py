@@ -115,29 +115,20 @@ def coherent_dedispersion(pol1,pol2,num):
     num = num // 2
     pol1_f = scipy.fft.fft(pol1)[:num]
     pol2_f = scipy.fft.fft(pol2)[:num]
-    
     apply_chirp(pol1_f,num)
     apply_chirp(pol2_f,num)
-    
     pol1_t = scipy.fft.ifft(pol1_f)
     pol2_t = scipy.fft.ifft(pol2_f)
-    
     pol_out = np.sqrt(np.abs(pol1_t)**2 + np.abs(pol2_t)**2)
-    
     return pol_out
 
 def coherent_dedispersion_pfb(pol1,pol2,num):
-    
     num = num // 2
-
     apply_chirp(pol1,num)
     apply_chirp(pol2,num)
-    
     pol1_t = scipy.fft.ifft(pol1)
     pol2_t = scipy.fft.ifft(pol2)
-    
     pol_out = np.sqrt(np.abs(pol1_t)**2 + np.abs(pol2_t)**2)
-    
     return pol_out
 
 def coherent_dedispersion_opfb(pol1,pol2,nchannels,pdata,pnum,location):
@@ -198,8 +189,8 @@ def coherent_dedispersion_cspfb(pol1,pol2,nchannels,pdata,pnum,location):
     fend = 0
     psize = 0
     for i in range(num):
-        fc -= bw / 2
         
+        fc -= bw / 2
         freq1 = scipy.fft.fft(pol1[i])
         freq2 = scipy.fft.fft(pol2[i])
         
