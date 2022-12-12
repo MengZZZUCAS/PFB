@@ -80,7 +80,7 @@ def integral_data(data,size,n=1024):
     out[n-1] = sum / (size - n * bins + bins);
     return out
 
-def integral_data_pfb(data,psize,nchannels):
+def integral_data_opfb(data,psize,nchannels):
     num = nchannels // 2 + 1
     subpsize = psize // (num -1)
     idata = np.zeros((1024 * num))
@@ -97,19 +97,19 @@ def integral_data_pfb(data,psize,nchannels):
         idata[i*1024:(i+1)*1024] = integral_data(data[start:end],size)
     return idata
 
-# def integral_data_cspfb(data,psize,nchannels):
-#     num = nchannels // 2
-#     subpsize = psize // num
-#     idata = np.zeros((1024 * num))
-#     start = 0
-#     end = 0
-#     size = 0
-#     for i in range(num):
-#         start += size
-#         size = subpsize
-#         end = start + size
-#         idata[i*1024:(i+1)*1024] = integral_data(data[start:end],size)
-#     return idata
+def integral_data_cspfb(data,psize,nchannels):
+    num = nchannels // 2
+    subpsize = psize // num
+    idata = np.zeros((1024 * num))
+    start = 0
+    end = 0
+    size = 0
+    for i in range(num):
+        start += size
+        size = subpsize
+        end = start + size
+        idata[i*1024:(i+1)*1024] = integral_data(data[start:end],size)
+    return idata
 
 def coherent_dedispersion(pol1,pol2,num):
     num = num // 2
@@ -191,40 +191,27 @@ def coherent_dedispersion_opfb(pol1,pol2,nchannels,pdata,pnum,location):
         
 def coherent_dedispersion_cspfb(pol1,pol2,nchannels,pdata,pnum,location):
     freq_size = pol1.shape[1]
-    num = nchannels // 2 + 1
-    bandwidth = 400 / (num - 1)    
-    bw = 0
-    size = 0
+    num = nchannels // 2
+    bw = 400 / num    
     fc = 1582
     fstart = 0
     fend = 0
     psize = 0
     for i in range(num):
         fc -= bw / 2
-        if i == 0:
-            start = freq_size // 2
-            end = freq_size // 2 + freq_size // 4
-            bw = bandwidth / 2
-        elif i == 8:
-            start = freq_size // 2 - freq_size // 4
-            end = freq_size // 2 
-            bw = bandwidth / 2
-        else:
-            start = 0
-            end = freq_size
-            bw = bandwidth
-        size = end - start
         
-        freq1 = scipy.fft.fftshift(scipy.fft.fft(pol1[i]))[start:end]
-        freq2 = scipy.fft.fftshift(scipy.fft.fft(pol2[i]))[start:end]
+        freq1 = scipy.fft.fft(pol1[i])
+        freq2 = scipy.fft.fft(pol2[i])
         
-        apply_chirp(freq1,size,bw,fc)
-        apply_chirp(freq2,size,bw,fc)
+        apply_chirp(freq1,freq_size,bw,fc)
+        apply_chirp(freq2,freq_size,bw,fc)
+        
         fc -= bw / 2
         p1 = scipy.fft.ifft(freq1)
         p2 = scipy.fft.ifft(freq2)
+        
         p = np.sqrt(np.abs(p1)**2+np.abs(p2)**2)
         fstart += psize
         psize = get_period_size(bw)
         fend = fstart + psize
-        location[i] = fold_data(p,size,psize,pdata[fstart:fend],pnum[fstart:fend],location[i])
+        location[i] = fold_data(p,freq_size,psize,pdata[fstart:fend],pnum[fstart:fend],location[i])

@@ -1,5 +1,6 @@
 import numpy as np
 import scipy
+from scipy import signal
 
 def realignment_data(data,channel_num):
     # 数据补零，使得data个数是channel_num的整数倍
@@ -14,16 +15,27 @@ def realignment_data(data,channel_num):
     return polyphase_data
 
 def gen_filter_coeffs(numtaps, M):
-    coeffs = scipy.signal.firwin(numtaps*M, cutoff=1.0/M, window="hamming")
+    # coeffs = scipy.signal.firwin(numtaps*M, cutoff=1.0/M, window="hamming")
+    win_coeffs = scipy.signal.get_window("hamming",numtaps*M)
+    sinc = scipy.signal.firwin(numtaps*M,cutoff=1.0/M,window="hamming")
+    coeffs = np.zeros(win_coeffs.shape[0],dtype=complex)
+    for i in range(coeffs.shape[0]):
+        coeffs[i] = sinc[i] * win_coeffs[i]
+    # coeffs = sinc * win_coeffs
+    nv = np.arange(numtaps*M)
+    for i in range(coeffs.shape[0]):
+        coeffs[i] *= np.exp(1j * np.pi * nv[i] / M)
+
+    # coeffs = np.abs(coeffs)
     coeffs = np.reshape(coeffs, (M, -1), order='F')
     return coeffs
 
-def polyphase_filter(data,filter_coeffs,channel_num):   
-     
-    polyphase_data = realignment_data(data, channel_num)
-    polyphase_data = polyphase_data.reshape( (channel_num, -1), order='F')
+def polyphase_filter(data,filter_coeffs,channel_num):  
     
-    filt_data = np.zeros(polyphase_data.shape)
+    polyphase_data = realignment_data(data, channel_num)
+    # polyphase_data = polyphase_data.reshape( (channel_num, -1), order='F')
+    
+    filt_data = np.zeros(polyphase_data.shape,dtype=complex)
     for k in range(channel_num):
         filt_data[k] = scipy.signal.lfilter(filter_coeffs[k], 1, polyphase_data[k])
 
@@ -35,25 +47,12 @@ def kernel(data,coeffs,nchannels):
     freq_size = freq.shape[1]
     N = int(freq_size * nchannels // 2)
     myfreq = np.zeros((N), dtype=complex)
-    start = 0
-    end = 0
     mystart = 0
     myend = 0
-    size = 0
-    for i in range(nchannels // 2 + 1):
-        mystart += size
-        if i == 0:
-            start = freq_size // 2
-            end = freq_size
-        elif i == nchannels // 2:
-            start = 0
-            end = freq_size // 2 
-        else:
-            start = 0
-            end = freq_size
-        size = end - start
-        myend = mystart + size
-        myfreq[mystart:myend] = scipy.fft.fftshift(scipy.fft.fft(freq[i]))[start:end]
+    for i in range(nchannels // 2):
+        myend = mystart + freq_size
+        myfreq[mystart:myend] = scipy.fft.fft(freq[i])
+        mystart += freq_size
         
     return myfreq,freq
 

@@ -1,6 +1,8 @@
 # polyphase filter
 
-* data format psrdada
+## data format
+
+pulsar baseband data for psrdada (CASPSR backend)
 
 ## run
 

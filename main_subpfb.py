@@ -19,7 +19,7 @@ ptr,file_size = data.load_data(filename)
 # the num of blocks
 nblock = (file_size - 4096) // (2 * blocks)
 
-# nblock = 10
+# nblock = 10ss
 
 if flag:
     print("the nblock is %d\n" % nblock)
@@ -55,8 +55,10 @@ for i in range(nblock):
     else:
         p1,p2,subfreq1,subfreq2 = cspfb.criticalsample_pfb(pol1,pol2,coeff,nchannels)
         psr.coherent_dedispersion_cspfb(subfreq1,subfreq2,nchannels,pdata,pnum,location)
-        
-idata = psr.integral_data_pfb(pdata,psize,nchannels)     
+if pfb_type == "opfb":      
+    idata = psr.integral_data_opfb(pdata,psize,nchannels)  
+else:
+    idata = psr.integral_data_cspfb(pdata,psize,nchannels)  
 
 
 end = time.time()

@@ -7,11 +7,11 @@ import opfb
 import psr
 
 flag = True
-pfb_type = "opfb"
+pfb_type = "cspfb"
 
 blocks = pow(2,22)
 
-filename = "../../data/J0437-4715.dada"
+filename = "../data/J0437-4715.dada"
 
 # load data, and skip header(4096)
 ptr,file_size = data.load_data(filename)
@@ -48,6 +48,7 @@ for i in range(nblock):
     bdata = psr.coherent_dedispersion_pfb(p1,p2,blocks)
     location = psr.fold_data(bdata,blocks//2,psize,pdata,pnum,location)
 
+np.savetxt("oopfb.txt",pdata)
 idata = psr.integral_data(pdata,psize)
 
 end = time.time()
